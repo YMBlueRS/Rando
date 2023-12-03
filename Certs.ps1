@@ -15,7 +15,7 @@ function Invoke-Certify
     $StringWriter = New-Object IO.StringWriter
     [Console]::SetOut($StringWriter)
 
-    [C3rt1fy.Program]::main(@("find", "/enabled"))
+    [C3rt1fy.Program]::main(@("find", "/enabled", "/vuln"))
 
     [Console]::SetOut($OldConsoleOut)
     $Results = $StringWriter.ToString()
