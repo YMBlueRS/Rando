@@ -19,5 +19,3 @@ function Invoke-Certify
     $Results
   
 }
-
-Invoke-Certify find /enabled
