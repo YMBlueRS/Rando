@@ -1,8 +1,6 @@
 function test
 {
-  $a = "Language Mode:"
-  $a
-  $ExecutionContext.SessionState.LanguageMode
+  $ExecutionContext.SessionState.LanguageMode  > $home\Output\LM.out
 }
 
-test > $home\Output\LM.out
+test
