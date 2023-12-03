@@ -12,10 +12,13 @@ function Invoke-Certify
     $StringWriter = New-Object IO.StringWriter
     [Console]::SetOut($StringWriter)
 
-    [C3rt1fy.Program]::main([string[]]$args)
+    [C3rt1fy.Program]::main(@("find", "/enabled"))
 
     [Console]::SetOut($OldConsoleOut)
     $Results = $StringWriter.ToString()
     $Results
   
 }
+
+$a = "`r`nLoaded Certs-thing`r`n"
+$a
