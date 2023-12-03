@@ -1,3 +1,6 @@
+$a = "`r`nLoading Certs-thing`r`n"
+$a
+
 function Invoke-Certify
 {
 
@@ -20,5 +23,5 @@ function Invoke-Certify
   
 }
 
-$a = "`r`nLoaded Certs-thing`r`n"
+$a = "`r`nDone oaded Certs-thing!`r`n"
 $a
