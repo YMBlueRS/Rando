@@ -12,10 +12,12 @@ function Invoke-Certify
     $StringWriter = New-Object IO.StringWriter
     [Console]::SetOut($StringWriter)
 
+    [C3rt1fy.Program]::main([string[]]$args)
+
     [Console]::SetOut($OldConsoleOut)
     $Results = $StringWriter.ToString()
     $Results
   
 }
 
-Invoke-Certify
+Invoke-Certify find /enabled
