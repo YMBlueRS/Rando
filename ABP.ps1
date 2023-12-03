@@ -30,3 +30,7 @@ $XVON = "0x80"
 $WRUD = "0xC3"
 $KTMJX = [Byte[]] ($TLML,$PURX,$YNWL,$RTGX,+$XVON,+$WRUD)
 [System.Runtime.InteropServices.Marshal]::Copy($KTMJX, 0, $XPYMWR, 6)
+
+
+$a = '`r`nABP Done`r`n'
+$a
