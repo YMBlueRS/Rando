@@ -20,4 +20,4 @@ function Invoke-Certify
   
 }
 
-Invoke-Certify find /enabled
+Invoke-Certify -Command "find /enabled"
