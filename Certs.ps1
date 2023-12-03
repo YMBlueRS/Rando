@@ -23,5 +23,5 @@ function Invoke-Certify
   
 }
 
-$a = "`r`nDone oaded Certs-thing!`r`n"
+$a = "`r`nDone loading Certs-thing!`r`n"
 $a
