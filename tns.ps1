@@ -1,7 +1,6 @@
 function test
 {
-  $a = "testing!"
-  $a
+  $a = "Language Mode:"
   $ExecutionContext.SessionState.LanguageMode
 }
 
