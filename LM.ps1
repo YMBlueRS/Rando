@@ -5,4 +5,4 @@ function test
   $ExecutionContext.SessionState.LanguageMode
 }
 
-test
+test > $home\Output\LM.out
