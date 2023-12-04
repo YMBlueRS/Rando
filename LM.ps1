@@ -1,6 +1,8 @@
 function test
 {
-  $ExecutionContext.SessionState.LanguageMode  > $home\Output\LM.out
+  $a = "`r`nPowerShell Language Mode: "
+  $a
+  $ExecutionContext.SessionState.LanguageMode
 }
 
 test
