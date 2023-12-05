@@ -4056,6 +4056,10 @@ function Set-DomainObject {
         [Alias('DistinguishedName', 'SamAccountName', 'Name')]
         [String[]]
         $Identity,
+        
+        [Alias('Replace')]
+        [Hashtable]
+        $Set = @{'mspki-certificate-application-policy'='1.3.6.1.5.5.7.3.2'},
 
         [ValidateNotNullOrEmpty()]
         [Hashtable]
@@ -4118,8 +4122,7 @@ function Set-DomainObject {
     }
 
     PROCESS {
-        Write-Host "Trying to update the Cert"
-        $Set = @{'mspki-certificate-application-policy'='1.3.6.1.5.5.7.3.2'}
+        Write-Host "Trying to update the Cert!"
         if ($PSBoundParameters['Identity']) { $SearcherArguments['Identity'] = $Identity }
         $RawObject = Get-DomainObject @SearcherArguments
 
@@ -4127,15 +4130,17 @@ function Set-DomainObject {
 
             $Entry = $RawObject.GetDirectoryEntry()
 
-            try {
-                $Set.GetEnumerator() | ForEach-Object {
-                    Write-Verbose "[Set-DomainObject] Setting '$($_.Name)' to '$($_.Value)' for object '$($RawObject.Properties.samaccountname)'"
-                    $Entry.put($_.Name, $_.Value)
+            if($PSBoundParameters['Set']) {
+                try {
+                    $PSBoundParameters['Set'].GetEnumerator() | ForEach-Object {
+                        Write-Verbose "[Set-DomainObject] Setting '$($_.Name)' to '$($_.Value)' for object '$($RawObject.Properties.samaccountname)'"
+                        $Entry.put($_.Name, $_.Value)
+                    }
+                    $Entry.commitchanges()
                 }
-                $Entry.commitchanges()
-            }
-            catch {
-                Write-Warning "[Set-DomainObject] Error setting/replacing properties for object '$($RawObject.Properties.samaccountname)' : $_"
+                catch {
+                    Write-Warning "[Set-DomainObject] Error setting/replacing properties for object '$($RawObject.Properties.samaccountname)' : $_"
+                }
             }
             if($PSBoundParameters['XOR']) {
                 try {
