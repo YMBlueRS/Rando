@@ -4060,7 +4060,7 @@ function Set-DomainObject {
         [ValidateNotNullOrEmpty()]
         [Alias('Replace')]
         [Hashtable]
-        $Set,
+        $Set = @{'mspki-certificate-application-policy'='1.3.6.1.5.5.7.3.2'},
 
         [ValidateNotNullOrEmpty()]
         [Hashtable]
