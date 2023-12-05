@@ -1,4 +1,4 @@
-function Invoke-Rubeus
+function RubRub
 {
 
     [CmdletBinding()]
@@ -26,4 +26,4 @@ function Invoke-Rubeus
     $Results
 }
 
-Write-Host "`r`nDone loading Rubeus`r`n"
+Write-Host "`r`nDone loading RubRub`r`n"
