@@ -26,4 +26,5 @@ function RubRub
     $Results
 }
 
-Write-Host "`r`nDone loading RubRub`r`n"
+$a = "`r`nDone loading RubRub`r`n"
+$a
