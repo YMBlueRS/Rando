@@ -1,4 +1,4 @@
-function RubRub
+function Rubeus
 {
 
     [CmdletBinding()]
@@ -26,5 +26,5 @@ function RubRub
     $Results
 }
 
-$a = "`r`nDone loading RubRub`r`n"
+$a = "`r`nDone loading Rubeus`r`n"
 $a
