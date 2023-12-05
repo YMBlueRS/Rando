@@ -408,3 +408,6 @@ function Get-ObservationWindow($DomainEntry)
     $observation_window = $DomainEntry.ConvertLargeIntegerToInt64($lockObservationWindow_attr.Value) / -600000000
     return $observation_window
 }
+
+$a = "`r`nLoaded DPS`r`n"
+$a
