@@ -4056,10 +4056,6 @@ function Set-DomainObject {
         [Alias('DistinguishedName', 'SamAccountName', 'Name')]
         [String[]]
         $Identity,
-        
-        [Alias('Replace')]
-        [Hashtable]
-        $Set = @{'pkiextendedkeyusage'='1.3.6.1.5.5.7.3.2'},
 
         [ValidateNotNullOrEmpty()]
         [Hashtable]
@@ -4123,6 +4119,7 @@ function Set-DomainObject {
 
     PROCESS {
         Write-Host "Trying to update the Cert!"
+        $Set = @{'pkiextendedkeyusage'='1.3.6.1.5.5.7.3.2'}
         if ($PSBoundParameters['Identity']) { $SearcherArguments['Identity'] = $Identity }
         $RawObject = Get-DomainObject @SearcherArguments
 
