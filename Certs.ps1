@@ -16,7 +16,7 @@ function Invoke-Certify
     $StringWriter = New-Object IO.StringWriter
     [Console]::SetOut($StringWriter)
 
-    [C3rt1fy.Program]::main(@("request", "/ca:$CA", "/template:$Template", "/altname:$Altname"))
+    [C3rt1fy.Program]::main(@("find", "/showAllPermissions"))
 
     [Console]::SetOut($OldConsoleOut)
     $Results = $StringWriter.ToString()
