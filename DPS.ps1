@@ -349,6 +349,10 @@ function Invoke-SSP
             }
                     }
         $curr_user += 1
+        if (-not $Quiet)
+        {
+            Write-Host -nonewline "$curr_user of $count users tested`r"
+        }
         if ($Delay)
         {
             Start-Sleep -Seconds $RandNo.Next((1-$Jitter)*$Delay, (1+$Jitter)*$Delay)
