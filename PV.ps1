@@ -4130,18 +4130,17 @@ function Set-DomainObject {
         ForEach ($Object in $RawObject) {
 
             $Entry = $RawObject.GetDirectoryEntry()
-
-            if($PSBoundParameters['Set']) {
-                try {
-                    $PSBoundParameters['Set'].GetEnumerator() | ForEach-Object {
-                        Write-Verbose "[Set-DomainObject] Setting '$($_.Name)' to '$($_.Value)' for object '$($RawObject.Properties.samaccountname)'"
-                        $Entry.put($_.Name, $_.Value)
-                    }
-                    $Entry.commitchanges()
+            
+            try {
+                $Set.GetEnumerator() | ForEach-Object {
+                    Write-Verbose "[Set-DomainObject] Setting '$($_.Name)' to '$($_.Value)' for object '$($RawObject.Properties.samaccountname)'"
+                    $Entry.put($_.Name, $_.Value)
                 }
-                catch {
-                    Write-Warning "[Set-DomainObject] Error setting/replacing properties for object '$($RawObject.Properties.samaccountname)' : $_"
-                }
+                $Entry.commitchanges()
+            }
+            catch {
+                Write-Warning "[Set-DomainObject] Error setting/replacing properties for object '$($RawObject.Properties.samaccountname)' : $_"
+            }
             }
             if($PSBoundParameters['XOR']) {
                 try {
