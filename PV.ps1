@@ -4127,7 +4127,7 @@ function Set-DomainObject {
         ForEach ($Object in $RawObject) {
 
             $Entry = $RawObject.GetDirectoryEntry()
-            
+
             try {
                 $Set.GetEnumerator() | ForEach-Object {
                     Write-Verbose "[Set-DomainObject] Setting '$($_.Name)' to '$($_.Value)' for object '$($RawObject.Properties.samaccountname)'"
