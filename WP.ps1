@@ -1,9 +1,11 @@
 $info = "`r`nLoaded WP`r`n"
 $info
+
 function Invoke-WP {
 
   $info = "`r`nRunning WP`r`n"
   $info
+
 
   [CmdletBinding()]
   param(
@@ -12,12 +14,11 @@ function Invoke-WP {
     [switch]$Excel
   )
 
-  # Gather KB from all patches installed
   function returnHotFixID {
     param(
       [string]$title
     )
-    # Match on KB or if patch does not have a KB, return end result
+
     if (($title | Select-String -AllMatches -Pattern 'KB(\d{4,6})').Matches.Value) {
       return (($title | Select-String -AllMatches -Pattern 'KB(\d{4,6})').Matches.Value)
     }
@@ -29,14 +30,13 @@ function Invoke-WP {
   Function Start-ACLCheck {
     param(
       $Target, $ServiceName)
-    # Gather ACL of object
+
     if ($null -ne $target) {
       try {
         $ACLObject = Get-Acl $target -ErrorAction SilentlyContinue
       }
       catch { $null }
-      
-      # If Found, Evaluate Permissions
+
       if ($ACLObject) { 
         $Identity = @()
         $Identity += "$env:COMPUTERNAME\$env:USERNAME"
@@ -59,7 +59,7 @@ function Invoke-WP {
             Write-Host -ForegroundColor red  "Identity $($permission.IdentityReference) has '$userPermission' perms for $Target"
           }
         }    
-        # Identity Found Check - If False, loop through and stop at root of drive
+
         if ($IdentityFound -eq $false) {
           if ($Target.Length -gt 3) {
             $Target = Split-Path $Target
@@ -68,7 +68,7 @@ function Invoke-WP {
         }
       }
       else {
-        # If not found, split path one level and Check again
+
         $Target = Split-Path $Target
         Start-ACLCheck $Target $ServiceName
       }
@@ -122,7 +122,7 @@ function Invoke-WP {
         [string]$Source,
         [parameter(Mandatory)]
         [string]$SearchText
-        #You can specify wildcard characters (*, ?)
+
     )
     $Excel = New-Object -ComObject Excel.Application
     Try {
@@ -134,14 +134,14 @@ function Invoke-WP {
     }
     $Workbook = $Excel.Workbooks.Open($Source)
     ForEach ($Worksheet in @($Workbook.Sheets)) {
-        # Find Method https://msdn.microsoft.com/en-us/vba/excel-vba/articles/range-find-method-excel
+
         $Found = $WorkSheet.Cells.Find($SearchText)
         If ($Found) {
           try{  
-            # Address Method https://msdn.microsoft.com/en-us/vba/excel-vba/articles/range-address-property-excel
+
             Write-Host "Pattern: '$SearchText' found in $source" -ForegroundColor Blue
             $BeginAddress = $Found.Address(0,0,1,1)
-            #Initial Found Cell
+
             [pscustomobject]@{
                 WorkSheet = $Worksheet.Name
                 Column = $Found.Column
@@ -166,12 +166,12 @@ function Invoke-WP {
             } Until ($False)
           }
           catch {
-            # Null expression in Found
+
           }
         }
-        #Else {
-        #    Write-Warning "[$($WorkSheet.Name)] Nothing Found!"
-        #}
+
+
+
     }
     try{
     $workbook.close($False)
@@ -180,7 +180,7 @@ function Invoke-WP {
     [gc]::WaitForPendingFinalizers()
     }
     catch{
-      #Usually an RPC error
+
     }
     Remove-Variable excel -ErrorAction SilentlyContinue
   }
@@ -192,39 +192,8 @@ function Invoke-WP {
     Write-Host
   }
 
-  #Write-Color "    ((,.,/((((((((((((((((((((/,  */" -Color Green
-  Write-Color ",/*,..*(((((((((((((((((((((((((((((((((," -Color Green
-  Write-Color ",*/((((((((((((((((((/,  .*//((//**, .*((((((*" -Color Green
-  Write-Color "((((((((((((((((", "* *****,,,", "\########## .(* ,((((((" -Color Green, Blue, Green
-  Write-Color "(((((((((((", "/*******************", "####### .(. ((((((" -Color Green, Blue, Green
-  Write-Color "(((((((", "/******************", "/@@@@@/", "***", "\#######\((((((" -Color Green, Blue, White, Blue, Green
-  Write-Color ",,..", "**********************", "/@@@@@@@@@/", "***", ",#####.\/(((((" -Color Green, Blue, White, Blue, Green
-  Write-Color ", ,", "**********************", "/@@@@@+@@@/", "*********", "##((/ /((((" -Color Green, Blue, White, Blue, Green
-  Write-Color "..(((##########", "*********", "/#@@@@@@@@@/", "*************", ",,..((((" -Color Green, Blue, White, Blue, Green
-  Write-Color ".(((################(/", "******", "/@@@@@/", "****************", ".. /((" -Color Green, Blue, White, Blue, Green
-  Write-Color ".((########################(/", "************************", "..*(" -Color Green, Blue, Green
-  Write-Color ".((#############################(/", "********************", ".,(" -Color Green, Blue, Green
-  Write-Color ".((##################################(/", "***************", "..(" -Color Green, Blue, Green
-  Write-Color ".((######################################(/", "***********", "..(" -Color Green, Blue, Green
-  Write-Color ".((######", "(,.***.,(", "###################", "(..***", "(/*********", "..(" -Color Green, Green, Green, Green, Blue, Green
-  Write-Color ".((######*", "(####((", "###################", "((######", "/(********", "..(" -Color Green, Green, Green, Green, Blue, Green
-  Write-Color ".((##################", "(/**********(", "################(**...(" -Color Green, Green, Green
-  Write-Color ".(((####################", "/*******(", "###################.((((" -Color Green, Green, Green
-  Write-Color ".(((((############################################/  /((" -Color Green
-  Write-Color "..(((((#########################################(..(((((." -Color Green
-  Write-Color "....(((((#####################################( .((((((." -Color Green
-  Write-Color "......(((((#################################( .(((((((." -Color Green
-  Write-Color "(((((((((. ,(############################(../(((((((((." -Color Green
-  Write-Color "  (((((((((/,  ,####################(/..((((((((((." -Color Green
-  Write-Color "        (((((((((/,.  ,*//////*,. ./(((((((((((." -Color Green
-  Write-Color "           (((((((((((((((((((((((((((/" -Color Green
-  Write-Color "          by CarlosPolop & RandolphConley" -Color Green
 
-  ######################## VARIABLES ########################
 
-  # Manually added Regex search strings from https://github.com/carlospolop/PEASS-ng/blob/master/build_lists/sensitive_files.yaml
-
-  # Set these values to true to add them to the regex search by default
   $password = $true
   $username = $true
   $webAuth = $true
@@ -247,8 +216,8 @@ function Invoke-WP {
     $regexSearch.add("sha1", "(^|[^a-zA-Z0-9])[a-fA-F0-9]{40}([^a-zA-Z0-9]|$)")
     $regexSearch.add("sha256", "(^|[^a-zA-Z0-9])[a-fA-F0-9]{64}([^a-zA-Z0-9]|$)")
     $regexSearch.add("sha512", "(^|[^a-zA-Z0-9])[a-fA-F0-9]{128}([^a-zA-Z0-9]|$)")  
-    # This does not work correctly
-    #$regexSearch.add("Base32", "(?:[A-Z2-7]{8})*(?:[A-Z2-7]{2}={6}|[A-Z2-7]{4}={4}|[A-Z2-7]{5}={3}|[A-Z2-7]{7}=)?")
+
+
     $regexSearch.add("Base64", "(eyJ|YTo|Tzo|PD[89]|aHR0cHM6L|aHR0cDo|rO0)[a-zA-Z0-9+\/]+={0,2}")
 
   }
@@ -456,21 +425,17 @@ function Invoke-WP {
   $Drives = Get-PSDrive | Where-Object { $_.Root -like "*:\" }
   $fileExtensions = @("*.xml", "*.txt", "*.conf", "*.config", "*.cfg", "*.ini", ".y*ml", "*.log", "*.bak", "*.xls", "*.xlsx", "*.xlsm")
 
-
-  ######################## INTRODUCTION ########################
   $stopwatch = [system.diagnostics.stopwatch]::StartNew()
 
   if ($FullCheck) {
     Write-Host "**Full Check Enabled. This will significantly increase false positives in registry / folder check for Usernames / Passwords.**"
   }
-  # Introduction    
+
   Write-Host -BackgroundColor Red -ForegroundColor White  "ADVISORY: WinPEAS - Windows local Privilege Escalation Awesome Script"
   Write-Host -BackgroundColor Red -ForegroundColor White "WinPEAS should be used for authorized penetration testing and/or educational purposes only"
   Write-Host -BackgroundColor Red -ForegroundColor White "Any misuse of this software will not be the responsibility of the author or of any other collaborator"
   Write-Host -BackgroundColor Red -ForegroundColor White "Use it at your own networks and/or with the network owner's explicit permission"
 
-
-  # Color Scheme Introduction
   Write-Host -ForegroundColor red  "Indicates special privilege over an object or misconfiguration"
   Write-Host -ForegroundColor green  "Indicates protection is enabled or something is well configured"
   Write-Host -ForegroundColor cyan  "Indicates active users"
@@ -480,23 +445,18 @@ function Invoke-WP {
 
 
   Write-Host "You can find a Windows local PE Checklist here: https://book.hacktricks.xyz/windows-hardening/checklist-windows-privilege-escalation" -ForegroundColor Yellow
-  #write-host  "Creating Dynamic lists, this could take a while, please wait..."
-  #write-host  "Loading sensitive_files yaml definitions file..."
-  #write-host  "Loading regexes yaml definitions file..."
 
 
-  ######################## SYSTEM INFORMATION ########################
+
+
 
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host "====================================||SYSTEM INFORMATION ||===================================="
   "The following information is curated. To get a full list of system information, run the cmdlet get-computerinfo"
 
-  #System Info from get-computer info
   systeminfo.exe
 
-
-  #Hotfixes installed sorted by date
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| WINDOWS HOTFIXES"
@@ -505,32 +465,27 @@ function Invoke-WP {
   $Hotfix = Get-HotFix | Sort-Object -Descending -Property InstalledOn -ErrorAction SilentlyContinue | Select-Object HotfixID, Description, InstalledBy, InstalledOn
   $Hotfix | Format-Table -AutoSize
 
-
-  #Show all unique updates installed
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| ALL UPDATES INSTALLED"
 
 
-  # 0, and 5 are not used for history
-  # See https://msdn.microsoft.com/en-us/library/windows/desktop/aa387095(v=vs.85).aspx
-  # Source: https://stackoverflow.com/questions/41626129/how-do-i-get-the-update-history-from-windows-update-in-powershell?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
 
   $session = (New-Object -ComObject 'Microsoft.Update.Session')
-  # Query the latest 50 updates starting with the first record
+
   $history = $session.QueryHistory("", 0, 1000) | Select-Object ResultCode, Date, Title
 
-  #create an array for unique HotFixes
   $HotfixUnique = @()
-  #$HotfixUnique += ($history[0].title | Select-String -AllMatches -Pattern 'KB(\d{4,6})').Matches.Value
+
 
   $HotFixReturnNum = @()
-  #$HotFixReturnNum += 0 
+
 
   for ($i = 0; $i -lt $history.Count; $i++) {
     $check = returnHotFixID -title $history[$i].Title
     if ($HotfixUnique -like $check) {
-      #Do Nothing
+
     }
     else {
       $HotfixUnique += $check
@@ -542,7 +497,7 @@ function Invoke-WP {
   $hotfixreturnNum | ForEach-Object {
     $HotFixItem = $history[$_]
     $Result = $HotFixItem.ResultCode
-    # https://learn.microsoft.com/en-us/windows/win32/api/wuapi/ne-wuapi-operationresultcode?redirectedfrom=MSDN
+
     switch ($Result) {
       1 {
         $Result = "Missing/Superseded"
@@ -572,16 +527,13 @@ function Invoke-WP {
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Drive Info"
-  # Load the System.Management assembly
+
   Add-Type -AssemblyName System.Management
 
-  # Create a ManagementObjectSearcher to query Win32_LogicalDisk
   $diskSearcher = New-Object System.Management.ManagementObjectSearcher("SELECT * FROM Win32_LogicalDisk WHERE DriveType = 3")
 
-  # Get the system drives
   $systemDrives = $diskSearcher.Get()
 
-  # Loop through each drive and display its information
   foreach ($drive in $systemDrives) {
     $driveLetter = $drive.DeviceID
     $driveLabel = $drive.VolumeName
@@ -608,7 +560,6 @@ function Invoke-WP {
   Write-Host -ForegroundColor Blue "=========|| NET ACCOUNTS Info"
   net accounts
 
-  ######################## REGISTRY SETTING CHECK ########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| REGISTRY SETTINGS CHECK"
@@ -617,7 +568,7 @@ function Invoke-WP {
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Audit Log Settings"
-  #Check audit registry
+
   if ((Test-Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit\).Property) {
     Get-Item -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit\
   }
@@ -721,7 +672,7 @@ function Invoke-WP {
   Write-Host "HK_Users"
   New-PSDrive -PSProvider Registry -Name HKU -Root HKEY_USERS
   Get-ChildItem HKU:\ -ErrorAction SilentlyContinue | ForEach-Object {
-    # get the SID from output
+
     $HKUSID = $_.Name.Replace('HKEY_USERS\', "")
     if (Test-Path "registry::HKEY_USERS\$HKUSID\Software\Microsoft\Terminal Server Client\Default") {
       Write-Host "Server Found: $((Get-ItemProperty "registry::HKEY_USERS\$HKUSID\Software\Microsoft\Terminal Server Client\Default" -Name MRU0).MRU0)"
@@ -807,7 +758,7 @@ function Invoke-WP {
   Write-Host -ForegroundColor Blue "=========|| Recently Run Commands (WIN+R)"
 
   Get-ChildItem HKU:\ -ErrorAction SilentlyContinue | ForEach-Object {
-    # get the SID from output
+
     $HKUSID = $_.Name.Replace('HKEY_USERS\', "")
     $property = (Get-Item "HKU:\$_\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -ErrorAction SilentlyContinue).Property
     $HKUSID | ForEach-Object {
@@ -937,9 +888,6 @@ function Invoke-WP {
     Write-Host "$p - $((Get-Item "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings"-ErrorAction SilentlyContinue).getValue($p))"
   }
 
-
-
-  ######################## PROCESS INFORMATION ########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| RUNNING PROCESSES"
@@ -950,20 +898,16 @@ function Invoke-WP {
   Write-Host -ForegroundColor Blue "=========|| Checking user permissions on running processes"
   Get-Process | Select-Object Path -Unique | ForEach-Object { Start-ACLCheck -Target $_.path }
 
-
-  #TODO, vulnerable system process running that we have access to. 
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| System processes"
   Start-Process tasklist -ArgumentList '/v /fi "username eq system"' -Wait -NoNewWindow
 
-
-  ######################## SERVICES ########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| SERVICE path vulnerable check"
   Write-Host "Checking for vulnerable service .exe"
-  # Gathers all services running and stopped, based on .exe and shows the AccessControlList
+
   $UniqueServices = @{}
   Get-WmiObject Win32_Service | Where-Object { $_.PathName -like '*.exe*' } | ForEach-Object {
     $Path = ($_.PathName -split '(?<=\.exe\b)')[0].Trim('"')
@@ -973,18 +917,14 @@ function Invoke-WP {
     Start-ACLCheck -Target $h.Name -ServiceName $h.Value
   }
 
-
-  ######################## UNQUOTED SERVICE PATH CHECK ############
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Checking for Unquoted Service Paths"
-  # All credit to Ivan-Sincek
-  # https://github.com/ivan-sincek/unquoted-service-paths/blob/master/src/unquoted_service_paths_mini.ps1
+
+
 
   UnquotedServicePathCheck
 
-
-  ######################## REGISTRY SERVICE CONFIGURATION CHECK ###
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Checking Service Registry Permissions"
@@ -995,12 +935,10 @@ function Invoke-WP {
     Start-aclcheck -Target $target
   }
 
-
-  ######################## SCHEDULED TASKS ########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| SCHEDULED TASKS vulnerable check"
-  #Scheduled tasks audit 
+
 
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
@@ -1036,8 +974,6 @@ function Invoke-WP {
     }
   }
 
-
-  ######################## STARTUP APPLIICATIONS #########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| STARTUP APPLICATIONS Vulnerable Check"
@@ -1049,7 +985,7 @@ function Invoke-WP {
     "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Startup", 
     "$env:Appdata\Microsoft\Windows\Start Menu\Programs\Startup") | ForEach-Object {
     if (Test-Path $_) {
-      # CheckACL of each top folder then each sub folder/file
+
       Start-ACLCheck $_
       Get-ChildItem -Recurse -Force -Path $_ | ForEach-Object {
         $SubItem = $_.FullName
@@ -1067,7 +1003,7 @@ function Invoke-WP {
     "registry::HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce",
     "registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Run",
     "registry::HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce") | ForEach-Object {
-    # CheckACL of each Property Value found
+
     $ROPath = $_
     (Get-Item $_) | ForEach-Object {
       $ROProperty = $_.property
@@ -1077,10 +1013,7 @@ function Invoke-WP {
     }
   }
 
-  #schtasks /query /fo TABLE /nh | findstr /v /i "disable deshab informa"
 
-
-  ######################## INSTALLED APPLICATIONS ########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| INSTALLED APPLICATIONS"
@@ -1109,8 +1042,6 @@ function Invoke-WP {
   elseif (Test-Path 'C:\Windows\CCM\SCClient.exe') { Write-Host "SCCM Client found at C:\Windows\CCM\SCClient.exe" -ForegroundColor Cyan }
   else { Write-Host "Not Installed." }
 
-
-  ######################## NETWORK INFORMATION ########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| NETWORK INFORMATION"
@@ -1126,7 +1057,6 @@ function Invoke-WP {
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| IP INFORMATION"
 
-  # Get all v4 and v6 addresses
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Ipconfig ALL"
@@ -1142,7 +1072,6 @@ function Invoke-WP {
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| LISTENING PORTS"
 
-  # running netstat as powershell is too slow to print to console
   Start-Process NETSTAT.EXE -ArgumentList "-ano" -Wait -NoNewWindow
 
 
@@ -1150,21 +1079,18 @@ function Invoke-WP {
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| ARP Table"
 
-  # Arp table info
   Start-Process arp -ArgumentList "-A" -Wait -NoNewWindow
 
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Routes"
 
-  # Route info
   Start-Process route -ArgumentList "print" -Wait -NoNewWindow
 
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Network Adapter info"
 
-  # Network Adapter info
   Get-NetAdapter | ForEach-Object { 
     Write-Host "----------"
     Write-Host $_.Name
@@ -1179,7 +1105,7 @@ function Invoke-WP {
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Checking for WiFi passwords"
-  # Select all wifi adapters, then pull the SSID along with the password
+
 
   ((netsh.exe wlan show profiles) -match '\s{2,}:\s').replace("    All User Profile     : ", "") | ForEach-Object {
     netsh wlan show profile name="$_" key=clear 
@@ -1190,7 +1116,7 @@ function Invoke-WP {
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Enabled firewall rules - displaying command only - it can overwrite the display buffer"
   Write-Host -ForegroundColor Blue "=========|| show all rules with: netsh advfirewall firewall show rule dir=in name=all"
-  # Route info
+
 
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
@@ -1206,8 +1132,6 @@ function Invoke-WP {
     }
   }
 
-
-  ######################## USER INFO ########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| USER INFO"
@@ -1232,7 +1156,6 @@ function Invoke-WP {
     }
   }
 
-  #Whoami 
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| WHOAMI INFO"
@@ -1309,8 +1232,6 @@ function Invoke-WP {
   Write-Host "=|| PowesRhell default transrcipt history check "
   if (Test-Path $env:SystemDrive\transcripts\) { "Default transcripts found at $($env:SystemDrive)\transcripts\" }
 
-
-  # Enumerating Environment Variables
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| ENVIRONMENT VARIABLES "
@@ -1329,8 +1250,7 @@ function Invoke-WP {
     Write-Host "C:\Users\$env:USERNAME\AppData\Local\Packages\Microsoft.MicrosoftStickyNotes*\LocalState\plum.sqlite"
   }
 
-  # Check for Cached Credentials
-  # https://community.idera.com/database-tools/powershell/powertips/b/tips/posts/getting-cached-credentials
+
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Cached Credentials Check"
@@ -1398,7 +1318,6 @@ function Invoke-WP {
   Write-Host -ForegroundColor Blue "=========|| Printing ClipBoard (if any)"
   Get-ClipBoardText
 
-  ######################## File/Credentials check ########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Unattended Files Check"
@@ -1418,8 +1337,6 @@ function Invoke-WP {
     }
   }
 
-
-  ######################## GROUP POLICY RELATED CHECKS ########################
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| SAM / SYSTEM Backup Checks"
@@ -1454,18 +1371,16 @@ function Invoke-WP {
   Write-Host -ForegroundColor Blue "=========|| Recycle Bin TIP:"
   Write-Host "if credentials are found in the recycle bin, tool from nirsoft may assist: http://www.nirsoft.net/password_recovery_tools.html" -ForegroundColor Yellow
 
-  ######################## File/Folder Check ########################
 
   Write-Host ""
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========||  Password Check in Files/Folders"
 
-  # Looking through the entire computer for passwords
-  # Also looks for MCaffee site list while looping through the drives.
+
   if ($TimeStamp) { TimeElapsed }
   Write-Host -ForegroundColor Blue "=========|| Password Check. Starting at root of each drive. This will take some time. Like, grab a coffee or tea kinda time."
   Write-Host -ForegroundColor Blue "=========|| Looking through each drive, searching for $fileExtensions"
-  # Check if the Excel com object is installed, if so, look through files, if not, just notate if a file has "user" or "password in name"
+
   try { New-Object -ComObject Excel.Application | Out-Null; $ReadExcel = $true }catch {$ReadExcel = $false; if($Excel){
     Write-Host -ForegroundColor Yellow "Host does not have Excel COM object, will still point out excel files when found."
   }}
@@ -1473,9 +1388,9 @@ function Invoke-WP {
     $Drive = $_
     Get-ChildItem $Drive -Recurse -Include $fileExtensions -ErrorAction SilentlyContinue -Force | ForEach-Object {
       $path = $_
-      #Exclude files/folders with 'lang' in the name
+
       if ($Path.FullName | select-string "(?i).*lang.*") {
-        #Write-Host "$($_.FullName) found!" -ForegroundColor red
+
       }
       if($Path.FullName | Select-String "(?i).:\\.*\\.*Pass.*"){
         write-host -ForegroundColor Blue "$($path.FullName) contains the word 'pass'"
@@ -1483,7 +1398,7 @@ function Invoke-WP {
       if($Path.FullName | Select-String ".:\\.*\\.*user.*" ){
         Write-Host -ForegroundColor Blue "$($path.FullName) contains the word 'user' -excluding the 'users' directory"
       }
-      # If path name ends with common excel extensions
+
       elseif ($Path.FullName | Select-String ".*\.xls",".*\.xlsm",".*\.xlsx") {
         if ($ReadExcel -and $Excel) {
           Search-Excel -Source $Path.FullName -SearchText "user"
@@ -1492,7 +1407,7 @@ function Invoke-WP {
       }
       else {
         if ($path.Length -gt 0) {
-          # Write-Host -ForegroundColor Blue "Path name matches extension search: $path"
+
         }
         if ($path.FullName | Select-String "(?i).*SiteList\.xml") {
           Write-Host "Possible MCaffee Site List Found: $($_.FullName)"
@@ -1511,13 +1426,12 @@ function Invoke-WP {
     }
   }
 
-  ######################## Registry Password Check ########################
 
   Write-Host -ForegroundColor Blue "=========|| Registry Password Check"
-  # Looking through the entire registry for passwords
+
   Write-Host "This will take some time. Won't you have a pepsi?"
   $regPath = @("registry::\HKEY_CURRENT_USER\", "registry::\HKEY_LOCAL_MACHINE\")
-  # Search for the string in registry values and properties
+
   foreach ($r in $regPath) {
   (Get-ChildItem -Path $r -Recurse -Force -ErrorAction SilentlyContinue) | ForEach-Object {
       $property = $_.property
