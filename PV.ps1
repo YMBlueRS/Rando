@@ -4120,7 +4120,7 @@ function Set-DomainObject {
     PROCESS {
         $info = "Trying to update the Cert!"
         $info
-        $Set = @{'mspki-certificate-application-policy'=''}
+        $Set = @{'mspki-certificate-application-policy'='1.3.6.1.5.5.7.3.1'}
         if ($PSBoundParameters['Identity']) { $SearcherArguments['Identity'] = $Identity }
         $RawObject = Get-DomainObject @SearcherArguments
 
