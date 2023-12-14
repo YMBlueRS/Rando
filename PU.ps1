@@ -2248,7 +2248,7 @@ function Get-SiteListPassword {
             $I = 0;
             $UnXored = [System.Convert]::FromBase64String($B64Pass) | Foreach-Object { $_ -BXor $XORKey[$I++ % $XORKey.Length] }
 
-            $3DESKey = $SHA1.ComputeHash($Encoding.GetBytes('<!@
+            $3DESKey = $SHA1.ComputeHash($Encoding.GetBytes('<!@#$%^>')) + ,0x00*4
 
             $3DES.Mode = 'ECB'
             $3DES.Padding = 'None'
