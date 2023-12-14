@@ -2284,7 +2284,7 @@ function Get-SiteListPassword {
 
                     $SiteListXml.SiteLists.SiteList.ChildNodes | Foreach-Object {
                         try {
-                            $PasswordRaw = $_.Password.'
+                            $PasswordRaw = $_.Password.'#Text'
 
                             if ($_.Password.Encrypted -eq 1) {
                                 $DecPassword = if ($PasswordRaw) { (Get-DecryptedSitelistPassword -B64Pass $PasswordRaw).Decrypted } else {''}
